@@ -2,8 +2,10 @@ import Header from "./components/Header";
 import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Users from "./components/Users";
+import AddUser from "./components/AddUser";
 
 function App() {
+  const [showAddUser, setShowAddUser] = useState(false);
   const [users, setUsers] = useState([]);
   useEffect(() => {
     const getUsers = async () => {
@@ -23,7 +25,7 @@ function App() {
 
   // Fetch User
   const fetchUser = async (id) => {
-    const res = await fetch(`http://localhost:5000/users/${id}`);
+    const res = await fetch(`http://localhost:3000/users/${id}`);
     const data = await res.json();
 
     return data;
@@ -31,19 +33,27 @@ function App() {
 
   // Add User
   const addUser = async (user) => {
-    const res = await fetch("http://localhost:5000/users", {
+    const res = await fetch("http://localhost:3000/users", {
       method: "POST",
       headers: {
         "Content-type": "application/json",
       },
       body: JSON.stringify(user),
     });
+
+    const data = await res.json();
+
+    setUsers([...users, data]);
   };
 
   return (
     <Router>
       <div className='container'>
-        <Header></Header>
+        <Header
+          onAdd={() => setShowAddUser(!showAddUser)}
+          showAdd={showAddUser}
+        ></Header>
+        {showAddUser && <AddUser onAdd={addUser}></AddUser>}
         <Routes>
           <Route
             path='/'
